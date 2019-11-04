@@ -58,15 +58,20 @@ function! GetJsxIndent()
   call jsx#Log('cur syn type: '.cur_syn_type)
 
   " XML
-  if prev_syn_type == 'inline_template' || prev_syn_type == 'template'
-        \ && cur_syn_type == 'inline_template'
+  " if prev_syn_type == 'inline_template' || prev_syn_type == 'template'
+        " \ && cur_syn_type == 'inline_template'
+    " let ind = s:GetXMLIndent()
+  " endif
+  " if prev_syn_type == 'inline_expression' && cur_syn_type == 'template'
+        " \ || prev_syn_type == 'inline_expression' && cur_syn_type == 'inline_template'
+        " \ || prev_syn_type == 'template' && cur_syn_type == 'inline_expression'
+    " let ind = s:GetXMLIndent()
+  " endif
+  if prev_syn_type != 'default' 
+        \ && (cur_syn_type == 'template' || cur_syn_type == 'inline_template')
     let ind = s:GetXMLIndent()
   endif
-  if prev_syn_type == 'inline_expression' && cur_syn_type == 'template'
-        \ || prev_syn_type == 'template' && cur_syn_type == 'inline_expression'
-    let ind = s:GetXMLIndent()
-  endif
-  if prev_syn_type != 'default' && cur_syn_type == 'template'
+  if prev_syn_type == 'template' && cur_syn_type == 'inline_expression'
     let ind = s:GetXMLIndent()
   endif
 
