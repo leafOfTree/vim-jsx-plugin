@@ -68,7 +68,7 @@ execute 'syntax match jsxTemplateEmpty fold '.'+'.empty_tag_regexp.'+'
 
 syntax region jsxInlineExpression fold
       \ start=+{+
-      \ end=+}\ze\(\s*$\n\s*<\|<\)+
+      \ end=+}\ze\s*\($\n\s*<\|<\)+
       \ keepend 
       \ contained
       \ contains=jsxInlineTemplate,@JavaScriptSyntax
