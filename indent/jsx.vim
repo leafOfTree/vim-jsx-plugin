@@ -7,6 +7,7 @@ let s:template = ['jsxTemplate', 'jsxTemplateEmpty']
 let s:inline_template = ['jsxInlineTemplate']
 let s:inline_expression = ['jsxInlineExpression']
 let s:inline_attr = ['jsxAttrExpression']
+let s:tag_end = '\v^\s*\/?\>\s*'
 "}}}
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -42,9 +43,27 @@ setlocal indentexpr=GetJsxIndent()
 " Functions {{{
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! s:Appears(arrs, str)
+  return count(arrs, str) > 0
+endfunction
+
+function! s:NotAppears(arrs, str)
+  return count(arrs, str) == 0
+endfunction
+
+function! s:BothAppearsInSyn(appears, prev_syn, cur_syn)
+  let both = 0
+  for pairs in a:appears
+    if pairs[0] == a:prev_syn && pairs[1] == a:cur_syn
+      let both = 1
+    endif
+  endfor
+  return both
+endfunction
+
 function! GetJsxIndent()
-  let ind = 0
   let prevlnum = prevnonblank(v:lnum - 1)
+  let prevline = getline(prevlnum)
   let prevsyns = s:SynsSOL(prevlnum)
   " let prevsyns = s:SynsEOL(prevlnum)
 
@@ -52,32 +71,56 @@ function! GetJsxIndent()
   let cursyns = s:SynsSOL(v:lnum)
   " let cursyns = s:SynsEOL(v:lnum)
 
-  let prev_syn_type = s:SynType(prevsyns)
-  let cur_syn_type = s:SynType(cursyns)
-  call jsx#Log('prev syn type: '.prev_syn_type)
-  call jsx#Log('cur syn type: '.cur_syn_type)
+  let prev_syn = s:SynType(prevsyns)
+  let cur_syn = s:SynType(cursyns)
+  call jsx#Log('prev syn: '.prev_syn)
+  call jsx#Log('cur syn: '.cur_syn)
 
-  " XML
-  if prev_syn_type != 'default' && prev_syn_type != 'inline_expression'
-        \ && (cur_syn_type == 'template' || cur_syn_type == 'inline_template')
-    let ind = s:GetXMLIndent()
-  endif
-  if prev_syn_type == 'template' && cur_syn_type == 'inline_expression'
-    let ind = s:GetXMLIndent()
-  endif
+  " XML indent
+  echom 'check...'
+  let is_xml = s:BothAppearsInSyn([
+        \['template', 'template'],
+        \['inline_attr', 'template'],
+        \], prev_syn, cur_syn)
+  echom 'is_xml='.is_xml
+  " if NotAppears(['default', 'inline_expression', 'inline_attr', 'template'], prev_syn)
+        " \ && Appears(['template', 'inline_template'], cur_syn)
+    " let is_xml = 1
+  " endif
+  " if s:Appears(['template'], prev_syn)
+        " \ && s:Appears(['template'], cur_syn)
+    " let is_xml = 1
+  " endif
+  " if Appears(['template'], prev_syn)
+        " \ && Appears(['inline_expression'], cur_syn)
+    " let is_xml = 1
+  " endif
 
   " JavaScript
-  " if prev_syn_type == 'template' && cur_syn_type == 'inline_attr'
+  " if prev_syn == 'template' && cur_syn == 'inline_attr'
     " let ind = s:GetJavaScriptIndent()
   " endif
-  " if prev_syn_type == 'defualt' || cur_syn_type == 'default'
+  " if prev_syn == 'defualt' || cur_syn == 'default'
     " let ind = s:GetJavaScriptIndent()
   " endif
 
-  if !ind
-    call jsx#Log('---- No indent ----')
+  if is_xml
+    call jsx#Log('---- XML indent ----')
+    let ind = s:GetXMLIndent()
+    " Align '/>' and '>' with '<' for multiline tags.
+    if curline =~? s:tag_end 
+      let ind = ind - &sw
+    endif
+    " Then correct the indentation of any element following '/>' or '>'.
+    if prevline =~? s:tag_end
+      let ind = ind + &sw
+    endif
+  else
+    " JavaScript indent
+    call jsx#Log('---- JavaScript indent ----')
     let ind = s:GetJavaScriptIndent()
   endif
+
   call jsx#Log('indent: '.ind)
   return ind
 endfunction
