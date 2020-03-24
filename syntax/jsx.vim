@@ -51,12 +51,11 @@ syntax region javascriptDefault fold
       \ contains=@JavaScriptSyntax,jsxTemplate,jsxTemplateEmpty
 
 syntax region jsxTemplate fold
-      \ start=+<[a-zA-Z0-9]\+\(.*\/>\)\@!.*\(>\|\s*$\)+
-      \ end=+</[a-zA-Z0-9]\+>\ze\(\n\s*\)*)\?\(;\|,\)\s*$+
+      \ start=+<[a-zA-Z0-9.]\+\(.*\/>\)\@!.*\(>\|\s*$\)+
+      \ end=+</[a-zA-Z0-9.]\+>\ze\(\n\s*\)*)\?\(;\|,\)\s*$+
       \ keepend 
       \ contains=@HTMLSyntax,jsxInlineExpression
-
-" Template in one line
+" In one line
 syntax match jsxTemplate fold
       \ +<[a-zA-Z0-9]\+[^>]*>.*</[a-zA-Z0-9]\+>+
       \ contains=@HTMLSyntax,jsxInlineExpression
@@ -84,7 +83,13 @@ syntax region jsxInlineTemplate fold
       \ start=+<[a-zA-Z0-9]\+[^/>]*\(>\|\s*$\)+
       \ end=+</[a-zA-Z0-9]\+>+
       \ keepend 
-      \ extend
+      \ contained
+      \ contains=@HTMLSyntax,jsxInlineExpression,jsxInlineTemplate
+" Empty tag 
+syntax region jsxInlineTemplate fold
+      \ start=+<[a-zA-Z0-9]\+[^/>]*\(>\|\s*$\)+
+      \ end=+/>+
+      \ keepend 
       \ contained
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxInlineTemplate
 
