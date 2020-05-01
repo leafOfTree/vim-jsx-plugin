@@ -41,9 +41,6 @@ let s:bvars = {
 " template strings may want to be excluded when editing graphql:
 " au! Filetype javascript let b:syng_str = '^\%(.*template\)\@!.*string\|special'
 " au! Filetype javascript let b:syng_strcom = '^\%(.*template\)\@!.*string\|comment\|regex\|special\|doc'
-let b:syng_str = '^\%(.*template\)\@!.*string\|special'
-
-let b:syng_strcom = '^\%(.*template\)\@!.*string\|comment\|regex\|special\|doc'
 
 function s:GetVars()
   call extend(b:,extend(s:bvars,{'js_cache': [0,0,0]}),'keep')
@@ -236,8 +233,10 @@ function s:Continues()
   let tok = matchstr(strpart(getline('.'),col('.')-15,15),s:continuation)
   if tok =~ '[a-z:]'
     return tok == ':' ? s:ExprCol() : s:PreviousToken() != '.'
-  elseif tok !~ '[/>]'
+  elseif tok !~ '[/>,]'
     return tok isnot ''
+  elseif tok == ','
+    return 0
   endif
   return s:SynAt(line('.'),col('.')) !~? (tok == '>' ? 'jsflow\|^html' : 'regex')
 endfunction
@@ -321,7 +320,10 @@ endfunction
 " https://github.com/sweet-js/sweet.js/wiki/design#give-lookbehind-to-the-reader
 function s:IsBlock()
   let tok = s:PreviousToken()
-  if tok =~ '\k'
+  if join(s:stack) =~? 'xml\|jsx' && s:SynAt(line('.'),col('.')-1) =~? 'xml\|jsx'
+    let s:in_jsx = 1
+    return tok != '{'
+  elseif tok =~ '\k'
     if tok ==# 'type'
       return s:Pure('eval',"s:PreviousToken() !~# '^\\%(im\\|ex\\)port$' || s:PreviousToken() == '.'")
     elseif tok ==# 'of'
@@ -407,7 +409,10 @@ function GetJavascriptIndent()
   let [b:js_cache[0], num] = [v:lnum, b:js_cache[1]]
 
   let [num_ind, is_op, b_l, l:switch_offset, s:in_jsx] = [s:Nat(indent(num)),0,0,0,0]
+  echom 'debug --------------------------------------'
+  echom 'init is_op='.is_op
   if !num || s:LookingAt() == '{' && s:IsBlock()
+    echom 'in condition=-----------'
     let ilnum = line('.')
     if num && !s:in_jsx && s:LookingAt() == ')' && s:GetPair('(',')','bW',s:skip_expr)
       if ilnum == num
@@ -437,6 +442,7 @@ function GetJavascriptIndent()
             \ s:{s:PreviousToken() == '*' ? 'Previous' : ''}Token() !=# 'function')
         return num_ind + s:sw()
       else
+        echom 'last else'
         let is_op = s:sw()
       endif
       call cursor(l:lnum, lcol)
@@ -464,12 +470,20 @@ function GetJavascriptIndent()
         return virtcol('.') - 1
       endif
     endif
+    echom 'num_ind'
     return num_ind
   elseif num
+    echom 'num_ind='.num_ind
+    echom 'get case_offset='.get(l:,'case_offset',s:sw())
+    echom 'switch_offset='.l:switch_offset
+    echom 'b_l='.b_l
+    echom 'is_op='.is_op
     return s:Nat(num_ind + get(l:,'case_offset',s:sw()) + l:switch_offset + b_l + is_op)
   elseif nest
+    echom 'nest'
     return indent(nextnonblank(nest+1)) + b_l + is_op
   endif
+  echom 'indent: b_l='.b_l.', is_op='.is_op
   return b_l + is_op
 endfunction
 

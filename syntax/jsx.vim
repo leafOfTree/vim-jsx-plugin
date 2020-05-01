@@ -50,6 +50,7 @@ syntax region javascriptDefault fold
       \ end=+.*+
       \ contains=@JavaScriptSyntax,jsxTemplate,jsxTemplateEmpty
 
+" Template
 syntax region jsxTemplate fold
       \ start=+<[a-zA-Z0-9.]\+\(.*\/>\)\@!.*\(>\|\s*$\)+
       \ end=+</[a-zA-Z0-9.]\+>\ze\(\n\s*\)*)\?\(;\|,\)\s*$+
@@ -57,25 +58,39 @@ syntax region jsxTemplate fold
       \ contains=@HTMLSyntax,jsxInlineExpression
 " In one line
 syntax match jsxTemplate fold
-      \ +<[a-zA-Z0-9]\+[^>]*>.*</[a-zA-Z0-9]\+>+
+      \ +<[a-zA-Z0-9]\+[^>]*>.*</[a-zA-Z0-9]\+>$+
       \ contains=@HTMLSyntax,jsxInlineExpression
+syntax region jsxTemplateEmpty fold
+      \ start=+<[a-zA-Z0-9\.]\+$+
+      \ end=+^\s*/>\s*$+
+      \ keepend 
+      \ contains=@HTMLSyntax,jsxInlineExpression
+
+" syntax region jsxTemplateInline fold
+      " \ start=+<[a-zA-Z0-9]\+[^/>]*\(>\|\s*$\)+
+      " \ end=+</[a-zA-Z0-9]\+>+
+      " \ keepend 
+      " \ extend
+      " \ contained
+      " \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplateInline
 
 " Empty tag
 let empty_tag_regexp = '<[a-zA-Z0-9]\+\(.*<[^>]\+>\)\@!.\{-}\(\n\(.*<[^>]\+>\)\@!.\{-}\)*.\/>'
-execute 'syntax match jsxTemplateEmpty fold '.'+'.empty_tag_regexp.'+'
-      \.' contains=@HTMLSyntax,jsxInlineExpression'
+" execute 'syntax match jsxTemplateEmpty fold '.'+'.empty_tag_regexp.'+'
+      " \.' keepend'
+      " \.' contains=@HTMLSyntax,jsxInlineExpression'
 
 syntax region jsxInlineExpression fold
       \ start=+{+
-      \ end=+}\ze\s*\($\n\s*<\|<\)+
+      \ end=+}\ze\s*\($\|<\)+
       \ keepend 
       \ contained
       \ contains=jsxInlineTemplate,@JavaScriptSyntax
 syntax region jsxAttrExpression fold
       \ start=+{+
       \ end=+}\ze\([[:blank:]\/>]\+\|\s*$\)+
-      \ keepend 
       \ contained
+      \ keepend
       \ containedin=htmlValue
       \ contains=jsxInlineTemplate,@JavaScriptSyntax
 
@@ -91,12 +106,15 @@ syntax region jsxInlineTemplate fold
       \ end=+/>+
       \ keepend 
       \ contained
+      \ keepend
+      \ containedin=htmlValue
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxInlineTemplate
 
+
 " Empty tag
-execute 'syntax match jsxInlineTemplate fold '.'+'.empty_tag_regexp.'+'
-      \.' contained'
-      \.' contains=@HTMLSyntax,jsxInlineExpression,,jsxInlineTemplate'
+" execute 'syntax match jsxTemplateInline fold '.'+'.empty_tag_regexp.'+'
+      " \.' contained'
+      " \.' contains=@HTMLSyntax,jsxInlineExpression,,jsxTemplateInline'
 
 syntax match htmlTagN contained +<\s*[-a-zA-Z0-9\.]\++hs=s+1 
       \ contains=htmlTagName,htmlSpecialTagName,@htmlTagNameCluster,JsxComponentName
@@ -106,4 +124,11 @@ syntax match htmlTagN contained +</\s*[-a-zA-Z0-9\.]\++hs=s+2
 syntax match JsxComponentName /\v\C[A-Z][-a-zA-Z0-9.]+/ containedin=htmlTagN contained
 highlight default link JsxComponentName htmlTagName
 "}}}
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" Patch {{{
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+highlight! link htmlError None
 " vim: fdm=marker

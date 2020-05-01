@@ -1,5 +1,2 @@
-autocmd BufNewFile,BufRead *.js,*.ts,*.tsx call s:SetFiletype()
-
-function! s:SetFiletype()
-  let &filetype = 'jsx'
-endfunction
+autocmd BufNewFile,BufRead *.js set filetype=jsx
+autocmd BufNewFile,BufRead *.ts,*.tsx set filetype=tsx
