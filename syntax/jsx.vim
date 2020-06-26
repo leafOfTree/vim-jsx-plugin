@@ -50,35 +50,33 @@ syntax region javascriptDefault fold
       \ end=+.*+
       \ contains=@JavaScriptSyntax,jsxTemplate,jsxTemplateEmpty
 
-" Template
+""" Template
+" Ends with ;|,
 syntax region jsxTemplate fold
       \ start=+<[a-zA-Z0-9.]\+\(.*\/>\)\@!.*\(>\|\s*$\)+
       \ end=+</[a-zA-Z0-9.]\+>\ze\(\n\s*\)*)\?\(;\|,\)\s*$+
       \ keepend 
       \ contains=@HTMLSyntax,jsxInlineExpression
+" Surrouded by '(...)'
+syntax region jsxTemplate fold
+      \ start=+(\n\s*<[a-zA-Z0-9.]\+\(.*\/>\)\@!.*\(>\|\s*$\)+
+      \ end=+</[a-zA-Z0-9.]\+>\ze\(\n\s*\)*)\s*$+
+      \ keepend 
+      \ contains=@HTMLSyntax,jsxInlineExpression
+
 " In one line
 syntax match jsxTemplate fold
       \ +<[a-zA-Z0-9]\+[^>]*>.*</[a-zA-Z0-9]\+>$+
       \ contains=@HTMLSyntax,jsxInlineExpression
+" Empty
 syntax region jsxTemplateEmpty fold
       \ start=+<[a-zA-Z0-9\.]\+$+
       \ end=+^\s*/>\s*$+
       \ keepend 
       \ contains=@HTMLSyntax,jsxInlineExpression
 
-" syntax region jsxTemplateInline fold
-      " \ start=+<[a-zA-Z0-9]\+[^/>]*\(>\|\s*$\)+
-      " \ end=+</[a-zA-Z0-9]\+>+
-      " \ keepend 
-      " \ extend
-      " \ contained
-      " \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplateInline
-
 " Empty tag
 let empty_tag_regexp = '<[a-zA-Z0-9]\+\(.*<[^>]\+>\)\@!.\{-}\(\n\(.*<[^>]\+>\)\@!.\{-}\)*.\/>'
-" execute 'syntax match jsxTemplateEmpty fold '.'+'.empty_tag_regexp.'+'
-      " \.' keepend'
-      " \.' contains=@HTMLSyntax,jsxInlineExpression'
 
 syntax region jsxInlineExpression fold
       \ start=+{+
@@ -109,12 +107,6 @@ syntax region jsxInlineTemplate fold
       \ keepend
       \ containedin=htmlValue
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxInlineTemplate
-
-
-" Empty tag
-" execute 'syntax match jsxTemplateInline fold '.'+'.empty_tag_regexp.'+'
-      " \.' contained'
-      " \.' contains=@HTMLSyntax,jsxInlineExpression,,jsxTemplateInline'
 
 syntax match htmlTagN contained +<\s*[-a-zA-Z0-9\.]\++hs=s+1 
       \ contains=htmlTagName,htmlSpecialTagName,@htmlTagNameCluster,JsxComponentName
