@@ -1,3 +1,6 @@
+if exists("b:current_syntax") && b:current_syntax == 'jsx'
+  finish
+endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
@@ -33,10 +36,14 @@ endfunction
 " Load main syntax {{{
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call s:LoadFullSyntax('@JavaScriptSyntax', 'javascript')
-
 " Load syntax/*.vim to syntax group
 call s:LoadFullSyntax('@HTMLSyntax', 'html')
+
+" Avoid overload
+if hlexists('javaScriptComment') == 0
+  call s:LoadSyntax('@htmlJavaScript', 'javascript')
+endif
+" call s:LoadFullSyntax('@htmlJavaScript', 'javascript')
 "}}}
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -48,7 +55,7 @@ call s:LoadFullSyntax('@HTMLSyntax', 'html')
 syntax region javascriptDefault fold
       \ start=+.*+
       \ end=+.*+
-      \ contains=@JavaScriptSyntax,jsxTemplate,jsxTemplateEmpty
+      \ contains=@htmlJavaScript,jsxTemplate,jsxTemplateEmpty
 
 """ Template
 " Ends with ;|,
@@ -68,11 +75,17 @@ syntax region jsxTemplate fold
 syntax match jsxTemplate fold
       \ +<[a-zA-Z0-9]\+[^>]*>.*</[a-zA-Z0-9]\+>$+
       \ contains=@HTMLSyntax,jsxInlineExpression
+
 " Empty
 syntax region jsxTemplateEmpty fold
-      \ start=+<[a-zA-Z0-9\.]\+$+
+      \ start=+<[a-zA-Z0-9\.]\++
       \ end=+^\s*/>\s*$+
-      \ keepend 
+      \ keepend
+      \ contains=@HTMLSyntax,jsxInlineExpression
+syntax region jsxTemplateEmpty fold
+      \ start=+<[a-zA-Z0-9\.]\++
+      \ end=+/>\s*$+
+      \ keepend
       \ contains=@HTMLSyntax,jsxInlineExpression
 
 " Empty tag
@@ -83,24 +96,24 @@ syntax region jsxInlineExpression fold
       \ end=+}\ze\s*\($\|<\)+
       \ keepend 
       \ contained
-      \ contains=jsxInlineTemplate,@JavaScriptSyntax
+      \ contains=jsxInlineTemplate,@htmlJavaScript
 syntax region jsxAttrExpression fold
       \ start=+{+
       \ end=+}\ze\([[:blank:]\/>]\+\|\s*$\)+
       \ contained
       \ keepend
       \ containedin=htmlValue
-      \ contains=jsxInlineTemplate,@JavaScriptSyntax
+      \ contains=jsxInlineTemplate,@htmlJavaScript
 
 syntax region jsxInlineTemplate fold
-      \ start=+<[a-zA-Z0-9]\+[^/>]*\(>\|\s*$\)+
+      \ start=+<[a-zA-Z0-9]\+[^>]*\(>\|\s*$\)+
       \ end=+</[a-zA-Z0-9]\+>+
       \ keepend 
       \ contained
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxInlineTemplate
 " Empty tag 
 syntax region jsxInlineTemplate fold
-      \ start=+<[a-zA-Z0-9]\+[^/>]*\(>\|\s*$\)+
+      \ start=+<[a-zA-Z0-9]\+[^>]*\(>\|\s*$\)+
       \ end=+/>+
       \ keepend 
       \ contained
@@ -123,4 +136,7 @@ highlight default link JsxComponentName htmlTagName
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 highlight! link htmlError None
+"}}}
+
+let b:current_syntax = 'jsx'
 " vim: fdm=marker
