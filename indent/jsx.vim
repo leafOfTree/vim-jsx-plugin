@@ -64,12 +64,9 @@ endfunction
 function! GetJsxIndent()
   let prevlnum = prevnonblank(v:lnum - 1)
   let prevline = getline(prevlnum)
-  let prevsyns = s:SynsSOL(prevlnum)
-  " let prevsyns = s:SynsEOL(prevlnum)
-
   let curline = getline(v:lnum)
+  let prevsyns = s:SynsSOL(prevlnum)
   let cursyns = s:SynsSOL(v:lnum)
-  " let cursyns = s:SynsEOL(v:lnum)
 
   let prev_syn = s:SynType(prevsyns)
   let cur_syn = s:SynType(cursyns)
@@ -80,33 +77,16 @@ function! GetJsxIndent()
   echom 'check...'
   let is_xml = s:BothAppearsInSyn([
         \['template', 'template'],
+        \['inline_template', 'inline_template'],
         \['inline_attr', 'template'],
         \], prev_syn, cur_syn)
   echom 'is_xml='.is_xml
-  " if NotAppears(['default', 'inline_expression', 'inline_attr', 'template'], prev_syn)
-        " \ && Appears(['template', 'inline_template'], cur_syn)
-    " let is_xml = 1
-  " endif
-  " if s:Appears(['template'], prev_syn)
-        " \ && s:Appears(['template'], cur_syn)
-    " let is_xml = 1
-  " endif
-  " if Appears(['template'], prev_syn)
-        " \ && Appears(['inline_expression'], cur_syn)
-    " let is_xml = 1
-  " endif
-
-  " JavaScript
-  " if prev_syn == 'template' && cur_syn == 'inline_attr'
-    " let ind = s:GetJavaScriptIndent()
-  " endif
-  " if prev_syn == 'defualt' || cur_syn == 'default'
-    " let ind = s:GetJavaScriptIndent()
-  " endif
 
   if is_xml
     call jsx#Log('---- XML indent ----')
     let ind = s:GetXMLIndent()
+
+    " Adjust indentation
     " Align '/>' and '>' with '<' for multiline tags.
     if curline =~? s:tag_end 
       let ind = ind - &sw
@@ -114,6 +94,11 @@ function! GetJsxIndent()
     " Then correct the indentation of any element following '/>' or '>'.
     if prevline =~? s:tag_end
       let ind = ind + &sw
+    endif
+
+    " Reduce indentation of ')}'
+    if curline =~ '^\s*)}\s*$'
+      let ind = ind - &sw
     endif
   else
     " JavaScript indent

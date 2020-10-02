@@ -87,20 +87,27 @@ syntax region jsxTemplateEmpty fold
       \ keepend
       \ contains=@HTMLSyntax,jsxInlineExpression
 
+" syntax region jsxInlineExpression fold
+      " \ start=+{+
+      " \ end=+}\ze\s*\($\|<\)+
+      " \ keepend 
+      " \ contained
+      " \ contains=jsxInlineTemplate,@htmlJavaScript
 syntax region jsxInlineExpression fold
-      \ start=+{+
-      \ end=+}\ze\s*\($\|<\)+
+      \ start=+^\s*\zs{+
+      \ end=+}\ze\s*$+
       \ keepend 
       \ contained
       \ contains=jsxInlineTemplate,@htmlJavaScript
 syntax region jsxAttrExpression fold
-      \ start=+{+
+      \ start=+=\zs{+
       \ end=+}\ze\([[:blank:]\/>]\+\|\s*$\)+
       \ contained
       \ keepend
-      \ containedin=htmlValue
+      \ containedin=jsxTemplate,htmlValue
       \ contains=jsxInlineTemplate,@htmlJavaScript
 
+" Template in expression
 syntax region jsxInlineTemplate fold
       \ start=+<[a-zA-Z0-9]\+[^>]*\(>\|\s*$\)+
       \ end=+</[a-zA-Z0-9]\+>+
