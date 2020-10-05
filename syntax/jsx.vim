@@ -59,13 +59,13 @@ syntax region javascriptDefault fold
 """ Template
 " Surrouded by '(...)'
 syntax region jsxTemplateOuter fold
-      \ start=+\(\w\)\@<!<[a-zA-Z0-9.]\+\(.*\/>\)\@!.*\(>\|\s*$\)+
-      \ end=+<\/[a-zA-Z0-9.]\+>\ze\(\n\s*\)*)\s*$+
+      \ start=+\(\w\)\@<!<[a-zA-Z0-9.]\+\(.*\/>\)\@![^>]*\(>\|\s*$\)+
+      \ end=+<\/[a-zA-Z0-9.]\+>\ze\(\n\s*\)*\()\|,\|;\|\s*$\)+
       \ keepend
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
 
 syntax region jsxTemplate fold
-      \ start=+\(\w\)\@<!<[a-zA-Z0-9.]\+\(.*\/>\)\@!.*\(>\|\s*$\)+
+      \ start=+\(\w\)\@<!<[a-zA-Z0-9.]\+\(.*\/>\)\@![^>]*\(>\|\s*$\)+
       \ end=+<\/[a-zA-Z0-9.]\+>+
       \ contained
       \ contains=@HTMLSyntax,jsxInlineExpression
