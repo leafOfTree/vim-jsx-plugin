@@ -57,11 +57,20 @@ syntax region javascriptDefault fold
       \ contains=@htmlJavaScript,jsxTemplateOuter,jsxTemplateEmpty
 
 """ Template
-" Surrouded by '(...)'
+" Surrouded by '(' and ')'
 syntax region jsxTemplateOuter fold
       \ start=+\(\w\)\@<!<[a-zA-Z0-9.]\+\(.*\/>\)\@![^>]*\(>\|\s*$\)+
       \ end=+<\/[a-zA-Z0-9.]\+>\ze\(\n\s*\)*\()\|,\|;\|\s*$\)\(\n\s*<\)\@!+
       \ keepend
+      \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
+" Empty
+syntax region jsxTemplateOuter fold
+      \ start=+<[a-zA-Z0-9.]\+[^>]*$+
+      \ end=+/>\s*$+
+      \ keepend
+      \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
+syntax match jsxTemplateOuter fold 
+      \ +<[a-zA-Z0-9.]\+[^>]*/>\s*$+
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
 
 syntax region jsxTemplate fold
@@ -78,11 +87,6 @@ syntax match jsxTemplate fold
 " Empty
 syntax region jsxTemplateEmpty fold
       \ start=+<[a-zA-Z0-9.]\+[^>]*$+
-      \ end=+^\s*/>\s*$+
-      \ keepend
-      \ contains=@HTMLSyntax,jsxInlineExpression
-syntax region jsxTemplateEmpty fold
-      \ start=+<[a-zA-Z0-9\.]\+[^>]*$+
       \ end=+/>\s*$+
       \ keepend
       \ contains=@HTMLSyntax,jsxInlineExpression
