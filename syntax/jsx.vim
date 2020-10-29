@@ -60,7 +60,7 @@ syntax region javascriptDefault fold
 " Surrouded by '(...)'
 syntax region jsxTemplateOuter fold
       \ start=+\(\w\)\@<!<[a-zA-Z0-9.]\+\(.*\/>\)\@![^>]*\(>\|\s*$\)+
-      \ end=+<\/[a-zA-Z0-9.]\+>\ze\(\n\s*\)*\()\|,\|;\|\s*$\)+
+      \ end=+<\/[a-zA-Z0-9.]\+>\ze\(\n\s*\)*\()\|,\|;\|\s*$\)\(\n\s*<\)\@!+
       \ keepend
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
 
