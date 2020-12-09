@@ -7,3 +7,8 @@ function! jsx#Log(msg)
     echom '['.s:name.']['.v:lnum.'] '.a:msg
   endif
 endfunction
+
+function! jsx#GetConfig(name, default)
+  let name = 'g:vim_jsx_plugin_'.a:name
+  return exists(name) ? eval(name) : a:default
+endfunction

@@ -2,6 +2,8 @@ if exists("b:current_syntax") && b:current_syntax == 'jsx'
   finish
 endif
 
+let s:load_full_syntax = jsx#GetConfig('load_full_syntax', 0)
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
 " Functions {{{
@@ -12,6 +14,7 @@ function! s:LoadSyntax(group, type)
     call s:LoadFullSyntax(a:group, a:type)
   else
     call s:LoadDefaultSyntax(a:group, a:type)
+  endif
 endfunction
 
 function! s:LoadDefaultSyntax(group, type)
@@ -27,7 +30,11 @@ endfunction
 
 function! s:LoadFullSyntax(group, type)
   unlet! b:current_syntax
-  execute 'syntax include '.a:group.' syntax/'.a:type.'.vim'
+  try
+    execute 'syntax include '.a:group.' syntax/'.a:type.'.vim'
+  catch
+    call jsx#Log('Error on loading full syntax '.a:type)
+  endtry
 endfunction
 "}}}
 
@@ -71,6 +78,12 @@ syntax region jsxTemplateOuter fold
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
 syntax match jsxTemplateOuter fold 
       \ +<[a-zA-Z0-9.]\+[^>]*/>\s*$+
+      \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
+" Fragment
+syntax region jsxTemplateOuter fold 
+      \ start=+<>+
+      \ end=+<\/>+
+      \ keepend
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
 
 syntax region jsxTemplate fold
