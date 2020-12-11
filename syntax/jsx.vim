@@ -64,10 +64,11 @@ syntax region javascriptDefault fold
       \ contains=@htmlJavaScript,jsxTemplateOuter,jsxTemplateEmpty
 
 """ Template
-" Surrouded by '(' and ')'
+" Start with '(' 
+" end with ')' or ',' or ';', not followed by another ')' or '}'
 syntax region jsxTemplateOuter fold
       \ start=+\(\w\)\@<!<[a-zA-Z0-9.]\+\(.*\/>\)\@![^>]*\(>\|\s*$\)+
-      \ end=+<\/[a-zA-Z0-9.]\+>\ze\(\n\s*\)*\()\|,\|;\|\s*$\)\(\n\s*<\)\@!+
+      \ end=+<\/[a-zA-Z0-9.]\+>\ze\(\n\s*\)*\()\|,\|;\)\()\|}\)\@!\(\n\s*<\)\@!+
       \ keepend
       \ contains=@HTMLSyntax,jsxInlineExpression,jsxTemplate
 " Empty
