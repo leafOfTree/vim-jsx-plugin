@@ -1,2 +1,2 @@
-autocmd BufNewFile,BufRead *.js,*.jsx setf jsx
-autocmd BufNewFile,BufRead *.ts,*.tsx setf tsx
+autocmd BufNewFile,BufRead *.js,*.jsx set filetype=jsx
+autocmd BufNewFile,BufRead *.ts,*.tsx set filetype=tsx
